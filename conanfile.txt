@@ -1,0 +1,14 @@
+[requires]
+fmt/10.1.1
+
+[generators]
+CMakeToolchain
+CMakeDeps
+
+[layout]
+cmake_layout
+
+[imports]
+include, *.h -> ./third_party @ folder=True
+include, *.hpp -> ./third_party @ folder=True
+
