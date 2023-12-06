@@ -14,7 +14,7 @@ ReadFileForwardIterator::ReadFileForwardIterator(
   size_t block_size
 ) : block_size_(UpToMultipleOf(kShardSize, block_size)),
     buffer_(block_size_),
-    in_(path, std::ios::binary) {
+    in_(path, std::ios::binary | std::ios::in) {
   assert(in_.is_open());
 }
 
@@ -29,13 +29,72 @@ std::optional<Shard> ReadFileForwardIterator::Next() {
     }
 
     for (size_t i = 0; i < shard_count; ++i) {
-      queue_.push(ToInt(buffer_.data() + i * kShardSize));
+      queue_.push(ByteToInt(buffer_.data() + i * kShardSize));
     }
   }
   auto extracted = queue_.front();
   queue_.pop();
   
   return extracted;
+}
+
+ReadFileForwardIterator::ReadFileForwardIterator(ReadFileForwardIterator&& other) 
+: block_size_(UpToMultipleOf(kShardSize, other.block_size_)),
+  buffer_(std::move(other.buffer_)),
+  queue_(std::move(other.queue_)) {
+  try {
+    in_ = std::move(other.in_); // no noexcept
+  }
+  catch (...) {
+    // later
+  }
+}
+
+ReadFileForwardIterator::~ReadFileForwardIterator() {
+  in_.close();
+}
+
+
+WriteFileForwardIterator::WriteFileForwardIterator(
+  const std::string& path, 
+  size_t block_size
+) : block_size_(UpToMultipleOf(kShardSize, block_size)),
+    buffer_(block_size_),
+    out_(path, std::ios::binary | std::ios::out) {
+  assert(out_.is_open());
+}
+
+WriteFileForwardIterator::WriteFileForwardIterator(WriteFileForwardIterator&& other) 
+: block_size_(UpToMultipleOf(kShardSize, other.block_size_)),
+  buffer_(std::move(other.buffer_)),
+  queue_(std::move(other.queue_)) {
+  try {
+    out_ = std::move(other.out_); // no noexcept
+  }
+  catch (...) {
+    // later
+  }
+}
+
+bool WriteFileForwardIterator::AssignAndNext(Shard shard) {
+  if (queue_.size() == block_size_ / kShardSize) {
+    for (size_t i = 0; !queue_.empty(); ++i) {
+      IntToByte(
+        queue_.front(), 
+        buffer_.data() + i * kShardSize
+      );
+      
+      queue_.pop();
+    }
+    out_.write(buffer_.data(), block_size_);
+  }
+  queue_.push(shard);
+
+  return true;
+}
+
+WriteFileForwardIterator::~WriteFileForwardIterator() {
+  out_.close();
 }
 
 

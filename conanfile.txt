@@ -8,7 +8,6 @@ CMakeDeps
 [layout]
 cmake_layout
 
-[imports]
-include, *.h -> ./third_party @ folder=True
-include, *.hpp -> ./third_party @ folder=True
+[options]
+fmt:shared=True
 

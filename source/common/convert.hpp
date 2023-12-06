@@ -1,7 +1,11 @@
 #include <cstring>
 
-inline int ToInt(char* buffer) {
-    int a = 0;
-    memcpy(&a, buffer, sizeof(int));
-    return a;
+inline int ByteToInt(char* buffer) {
+  int number = 0;
+  memcpy(&number, buffer, sizeof(int));
+  return number;
+}
+
+inline void IntToByte(int number, char* buffer) {
+  memcpy(buffer, &number, sizeof(int));
 }

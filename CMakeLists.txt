@@ -7,7 +7,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(fmt REQUIRED)
 
-# WARNING: use it only when debug
 add_compile_options("-g3")
 add_compile_options("-Wall")
 add_compile_options("-Wextra")
@@ -19,5 +18,3 @@ add_subdirectory(source)
 
 target_link_libraries(HW1 ${CONAN_LIBS})
 target_link_libraries(${PROJECT_NAME} fmt::fmt)
-
-target_include_directories(HW1 PUBLIC ./third_party)

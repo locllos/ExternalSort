@@ -10,48 +10,50 @@
 namespace container::external {
 
 const uint64_t kShardSize = 4;
-using Shard = int; // std::array<type::Byte, kShardSize>;
+using Shard = int;
 
-class ReadFileForwardIterator : public IForwardIterator<Shard> {
+class ReadFileForwardIterator {
  public:
   
   ReadFileForwardIterator(
     const std::string& path, 
     size_t block_size
   );
-  
-  virtual std::optional<Shard> Next() override;
+  ReadFileForwardIterator(ReadFileForwardIterator&& other);
+
+  std::optional<Shard> Next();
   
   ~ReadFileForwardIterator();
 
  private:
-  const std::streamsize block_size_;
+  const size_t block_size_;
  private:
 
   std::vector<type::Byte> buffer_;
-  std::queue<Shard> queue_;
+  std::queue<Shard> queue_; // can be optimized by using the only buffer
   std::ifstream in_;
 };
 
-class WriteFileForwardIterator : public IForwardIterator<Shard> {
+class WriteFileForwardIterator {
  public:
   
   WriteFileForwardIterator(
     const std::string& path, 
     size_t block_size
   );
-  
-  virtual bool AssignAndNext() override;
-  
+  WriteFileForwardIterator(WriteFileForwardIterator&& other);
+
+  bool AssignAndNext(Shard shard);
+
   ~WriteFileForwardIterator();
 
  private:
-  const std::streamsize block_size_;
+  const size_t block_size_;
  private:
 
   std::vector<type::Byte> buffer_;
-  std::queue<Shard> queue_;
-  std::ifstream in_;
+  std::queue<Shard> queue_; // can be optimized by using the only buffer
+  std::ofstream out_;
 };
 
 } // container::external
