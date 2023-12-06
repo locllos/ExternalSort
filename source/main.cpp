@@ -40,9 +40,9 @@ void Test() {
 
 int main(int argC, const char* argV[]) {
   if (argC == 2 && std::string(argV[1]) == "test") {
-    GenerateTest(256 * 1024 / 4);
+    GenerateTest(256 * 1024 / 4 + 7);
     
-    size_t max_ram = 512;
+    size_t max_ram = 4 * 2 * 123;
     size_t block_size = 49;
     std::string source = "test_in";
     std::string destination = "test_out";
