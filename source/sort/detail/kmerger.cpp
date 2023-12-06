@@ -24,9 +24,11 @@ void KMerger::Sort() {
   ChunkedSort();
   KMergedSort();
 
-  for (size_t chunk = 0; chunk < chunks_count_; ++chunk) {
-    std::filesystem::remove(fmt::format("./{}/{}", tmp_folder_, chunk).c_str());
-  }}
+  // do not delete while debugging
+  // for (size_t chunk = 0; chunk < chunks_count_; ++chunk) {
+  //   std::filesystem::remove(fmt::format("./{}/{}", tmp_folder_, chunk).c_str());
+  // }
+}
 
 KMerger::KMerger(
   const std::string& source,

@@ -1,10 +1,63 @@
+#include <filesystem>
+#include <random>
 #include <sort/kmerge.hpp>
+#include <container/external/file_iterator.hpp>
 
 #include <fmt/core.h>
 #include <fmt/ranges.h>
 #include <iostream>
 
+void GenerateTest(int num) {
+  std::ofstream out("test_in");
+  std::random_device device;
+  std::mt19937 generator(device());
+  std::uniform_int_distribution<int32_t> sample(0, 10'000);
+
+  for (int i = 0; i < num; ++i) {
+    int32_t value = sample(generator);
+
+    out.write(reinterpret_cast<char *>(&value), 4);
+  }
+}
+
+void Test() {
+  container::external::ReadFileForwardIterator in("test_out", 4);
+  
+  auto prev = *in.Next();
+  while (auto next = in.Next()) {
+    if (prev > *next) {
+      fmt::print("prev={} | next={}. Wrong order\n", prev, *next);
+      throw std::runtime_error("Wrong sort order");
+    } 
+    else {
+      prev = *next;
+    }
+  }
+  fmt::print("Ok! :)\n");
+}
+
 int main(int argC, const char* argV[]) {
+  if (argC == 2 && std::string(argV[1]) == "test") {
+    GenerateTest(1024);
+    
+    size_t max_ram = 256;
+    size_t block_size = 32;
+    std::string source = "test_in";
+    std::string destination = "test_out";
+    std::string tmp_folder = "test_tmp";
+
+    sort::ExternalSort(
+      source,
+      destination,
+      tmp_folder,
+      max_ram,
+      block_size
+    );
+
+    Test();
+    return 0;
+  }
+
   if (argC < 5) {
     fmt::print("Not enough arguments!\n");
     return 1;

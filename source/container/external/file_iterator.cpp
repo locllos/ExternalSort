@@ -87,6 +87,7 @@ bool WriteFileForwardIterator::AssignAndNext(Shard shard) {
       queue_.pop();
     }
     out_.write(buffer_.data(), block_size_);
+    out_.flush();
   }
   queue_.push(shard);
 
