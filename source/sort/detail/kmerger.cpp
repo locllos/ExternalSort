@@ -62,7 +62,7 @@ void KMerger::ChunkedSort() {
     
     std::memset(
       reinterpret_cast<char*>(buffer.data()) + read_size, 
-      INT_MAX,
+      INT_MAX - 1,
       desired_size - read_size
     );
     FastSort(buffer);
