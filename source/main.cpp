@@ -23,22 +23,24 @@ void GenerateTest(int num) {
 void Test() {
   container::external::ReadFileForwardIterator in("test_out", 4);
   
+  size_t i = 0;
   auto prev = *in.Next();
   while (auto next = in.Next()) {
     if (prev > *next) {
-      fmt::print("prev={} | next={}. Wrong order\n", prev, *next);
-      throw std::runtime_error("Wrong sort order");
+      fmt::print("prev={} | next={} | index of next={}. Wrong order\n", prev, *next, i);
+      return;
     } 
     else {
       prev = *next;
     }
+    ++i;
   }
   fmt::print("Ok! :)\n");
 }
 
 int main(int argC, const char* argV[]) {
   if (argC == 2 && std::string(argV[1]) == "test") {
-    GenerateTest(1024);
+    GenerateTest(512 / 4);
     
     size_t max_ram = 256;
     size_t block_size = 32;

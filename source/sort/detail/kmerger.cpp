@@ -51,12 +51,15 @@ void KMerger::ChunkedSort() {
   size_t read_size = 0;
   size_t desired_size = max_ram_ / 2;
   std::vector<Shard> buffer(max_ram_ / (2 * kShardSize), 0);
-  do {
+  while (true) {
     in.read(
       reinterpret_cast<char*>(buffer.data()), 
       desired_size
     );
     read_size = in.gcount();
+    if (read_size == 0) {
+      break;
+    }
     
     std::memset(
       reinterpret_cast<char*>(buffer.data()) + read_size, 
@@ -73,10 +76,11 @@ void KMerger::ChunkedSort() {
       reinterpret_cast<char*>(buffer.data()),
       read_size
     );
+    out.flush();
     out.close();
 
     ++chunks_count_;
-  } while (read_size == desired_size);
+  };
 
   in.close();
 }

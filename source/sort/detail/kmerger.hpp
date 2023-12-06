@@ -24,7 +24,7 @@ class KMerger {
     size_t stream;
 
     bool operator<(const MergeState& other) const {
-      return value < other.value;
+      return value > other.value;
     }
   };
 

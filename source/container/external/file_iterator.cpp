@@ -19,6 +19,10 @@ ReadFileForwardIterator::ReadFileForwardIterator(
 }
 
 std::optional<Shard> ReadFileForwardIterator::Next() {
+  if (in_.eof()) {
+    return std::nullopt;
+  }
+
   if (queue_.empty()) {
     in_.read(buffer_.data(), block_size_);
     
